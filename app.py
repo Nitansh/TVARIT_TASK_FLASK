@@ -7,6 +7,7 @@ from flask import Flask, request
 from constant import ACTUAL_TEEN_LIST, ERROR_MSG_INVALID_INPUT, ERROR_MSG_INVALID_COUNT_ARGS, ARGS_ALLOWED
 from validation import validate_arguments_length, get_converted_args
 from logic import calculate_sum
+from util import get_response
 
 app = Flask(__name__)
 
@@ -15,22 +16,23 @@ def main():
   actual_args = request.get_json()
   if validate_arguments_length( actual_args, ARGS_ALLOWED ):
     if get_converted_args( actual_args ):
-      return app.response_class(
-        response=json.dumps( { "result" : calculate_sum( get_converted_args( actual_args ), ACTUAL_TEEN_LIST ) } ),
-        status=200,
-        mimetype='application/json',
+      return get_response(
+        app,
+        200,
+        calculate_sum( get_converted_args( actual_args ), ACTUAL_TEEN_LIST ),
+        False,
       )
     else :
-      return app.response_class(
-        response=json.dumps( { 'error' : ERROR_MSG_INVALID_INPUT } ),
-        status=400,
-        mimetype='application/json',
+      return get_response( app,
+        400,
+        ERROR_MSG_INVALID_INPUT,
+        True,
       )
   else:
-    return app.response_class(
-      response=json.dumps( { 'error' : ERROR_MSG_INVALID_COUNT_ARGS } ),
-      status=400,
-      mimetype='application/json',
+    return get_response( app,
+      400,
+      ERROR_MSG_INVALID_COUNT_ARGS,
+      True,
     )
 
 if __name__ == '__main__':
